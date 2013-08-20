@@ -1,0 +1,32 @@
+{
+  "name": "base-release",
+  "version": "0.0.0",
+  "description": "The base module for release packages.",
+  "homepage": "https://github.com/danielchatfield/release-base",
+  "main": "./index.js",
+  "bugs": "https://github.com/danielchatfield/release-base/issues",
+  "author": {
+    "name": "Daniel Chatfield",
+    "email": "chatfielddaniel@gmail.com",
+    "url": "https://github.com/danielchatfield"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danielchatfield/release-base"
+  },
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ],
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-cli": "~0.1.9",
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt-contrib-watch": "~0.5.0"
+  },
+  "scripts": {
+    "test": "grunt"
+  }
+}
