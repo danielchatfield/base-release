@@ -9,32 +9,15 @@
 var fs = require('fs');
 var path = require('path');
 
-var BaseRelease = module.exports;
+module.exports = BaseChannel;
 
-BaseRelease = function BaseRelease() {
-    
-};
-
-/**
- * Determines whether filepath exists
- *  Automatically joins all args
- * @return {Boolean}
- */
-BaseRelease.prototype.exists = function () {
-    if (arguments.length === 0) {
-        throw new Error("No argument supplied to exists(), at least 1 argument required.");
+function BaseChannel(dir) {
+    this.getRoot(dir);
+    if(!this.isPackage) {
+        return null;
+    } else {
+        return this;
     }
-    var filePath = path.join.apply(null, arguments);
-    return fs.existsSync(filePath);
-};
-
-/**
- * Determinies whether `dir` is the root directory.
- * @param  dir
- * @return {Boolean}
- */
-BaseRelease.prototype.isRoot = function (dir) {
-    return this.exists(dir, 'release.json');
 };
 
 /**
@@ -42,7 +25,7 @@ BaseRelease.prototype.isRoot = function (dir) {
  * @param  {string} dir
  * @return {string} rootDir
  */
-BaseRelease.prototype.getRoot = function (dir) {
+BaseChannel.prototype.getRoot = function (dir) {
     dir = dir || process.cwd();
 
     if(this.rootDir) { //already been resolved
@@ -63,3 +46,29 @@ BaseRelease.prototype.getRoot = function (dir) {
 
     return this.getRoot(path.join(dir,'..'));
 };
+
+/**
+ * Determinies whether `dir` is the root directory.
+ * @param  dir
+ * @return {Boolean}
+ */
+BaseChannel.prototype.isRoot = function (dir) {
+    return this.exists(dir, 'release.json');
+};
+
+/**
+ * Determines whether filepath exists
+ *  Automatically joins all args
+ * @return {Boolean}
+ */
+BaseChannel.prototype.exists = function () {
+    if (arguments.length === 0) {
+        throw new Error("No argument supplied to exists(), at least 1 argument required.");
+    }
+    var filePath = path.join.apply(null, arguments);
+    return fs.existsSync(filePath);
+};
+
+BaseChannel.prototype.currentVersion = function () {
+    return null;
+}

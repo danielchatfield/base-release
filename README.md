@@ -1,4 +1,8 @@
-# base-release [![Build Status](https://secure.travis-ci.org/danielchatfield/base-release.png?branch=master)](http://travis-ci.org/danielchatfield/base-release) [![Dependency Status](https://david-dm.org/danielchatfield/base-release.png)](https://david-dm.org/danielchatfield/base-release)
+# base-release
+
+[![Build Status](https://secure.travis-ci.org/danielchatfield/base-release.png?branch=master)](http://travis-ci.org/danielchatfield/base-release)
+[![Dependency Status](https://gemnasium.com/danielchatfield/base-release.png)](https://gemnasium.com/danielchatfield/base-release)
+[![NPM version](https://badge.fury.io/js/base-release.png)](http://badge.fury.io/js/base-release)
 
 The base module for release packages.
 
