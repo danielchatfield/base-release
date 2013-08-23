@@ -1,6 +1,6 @@
 'use strict';
 
-var BaseRelease = require('../index.js');
+var BaseChannel = require('../index.js');
 
 /*
   ======== A Handy Little Nodeunit Reference ========
@@ -22,15 +22,15 @@ var BaseRelease = require('../index.js');
     test.ifError(value)
 */
 
-exports['BaseRelease'] = {
+exports['BaseChannel'] = {
   setUp: function(done) {
     // setup here
     done();
   },
-  'is obj': function(test) {
+  'is func': function(test) {
     test.expect(1);
     // tests here
-    test.ok(typeof BaseRelease === 'object', 'Module is not object');
+    test.ok(typeof BaseChannel === 'function', 'Module is not object, it is' + typeof BaseChannel);
     test.done();
   }
 };

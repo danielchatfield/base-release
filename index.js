@@ -12,12 +12,21 @@ var path = require('path');
 module.exports = BaseChannel;
 
 function BaseChannel(dir) {
-    this.getRoot(dir);
-    if(!this.isPackage) {
-        return null;
-    } else {
-        return this;
-    }
+    var name = this.getName();
+    this.debug = require('debug')('release:' + name);
+    this.findRoot(dir);
+}
+
+/**
+ * Returns the name of the current channel (can be overridden)
+ * @return {String} Name of channel (e.g. npm)
+ */
+BaseChannel.prototype.getName = function () {
+    return this.constructor.name.toLowerCase();
+};
+
+BaseChannel.prototype.getRoot = function () {
+    return this.rootDir || this.cwd || null;
 };
 
 /**
@@ -25,26 +34,34 @@ function BaseChannel(dir) {
  * @param  {string} dir
  * @return {string} rootDir
  */
-BaseChannel.prototype.getRoot = function (dir) {
+BaseChannel.prototype.findRoot = function (dir) {
     dir = dir || process.cwd();
 
     if(this.rootDir) { //already been resolved
         return this.rootDir;
     }
 
-    if (this.isRoot(dir)) {
-        this.isPackage = true;
+    // set as current working directory so we don't have to pass as argument
+    this.cwd = dir;
+
+    if (this.isRoot()) {
+        this._isPackage = true;
         this.rootDir = dir;
         return dir;
     }
 
     if( dir === path.resolve('/')) {
         // Cannot go any further
-        this.isPackage = false;
+        this.debug('findRoot - reached root directory');
+        this._isPackage = false;
         return null;
     }
 
-    return this.getRoot(path.join(dir,'..'));
+    return this.findRoot(path.join(dir,'..'));
+};
+
+BaseChannel.prototype.isPackage = function () {
+    return this._isPackage;
 };
 
 /**
@@ -52,8 +69,8 @@ BaseChannel.prototype.getRoot = function (dir) {
  * @param  dir
  * @return {Boolean}
  */
-BaseChannel.prototype.isRoot = function (dir) {
-    return this.exists(dir, 'release.json');
+BaseChannel.prototype.isRoot = function () {
+    return this.exists('release.json');
 };
 
 /**
@@ -65,10 +82,34 @@ BaseChannel.prototype.exists = function () {
     if (arguments.length === 0) {
         throw new Error("No argument supplied to exists(), at least 1 argument required.");
     }
-    var filePath = path.join.apply(null, arguments);
-    return fs.existsSync(filePath);
+    var length = arguments.length;
+    for( var i = 0; i < length; i++ ) {
+        var filePath = path.join(this.getRoot(), arguments[i]);
+        if(fs.existsSync(filePath)) {
+            continue;
+        } else {
+            return false;
+        }
+    }
+    return true;
+};
+
+/**
+ * Loads a js|json file and returns it.
+ * @return {Object} The result of the require();
+ */
+BaseChannel.prototype.load = function (file) {
+    var filePath = path.join(this.getRoot(), file);
+    return require(filePath);
 };
 
 BaseChannel.prototype.currentVersion = function () {
     return null;
-}
+};
+
+/**
+ * Sets version number in source (to be overriden by channel)
+ */
+BaseChannel.prototype.setVersion = function () {
+    return false;
+};
