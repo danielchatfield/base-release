@@ -22,6 +22,9 @@ function BaseChannel(dir) {
  * @return {String} Name of channel (e.g. npm)
  */
 BaseChannel.prototype.getName = function () {
+  if(this._getName) {
+    return this._getName();
+  } 
   return this.constructor.name.toLowerCase();
 };
 
@@ -44,7 +47,7 @@ BaseChannel.prototype.findRoot = function (dir) {
   // set as current working directory so we don't have to pass as argument
   this.cwd = dir;
 
-  if (this.isRoot()) {
+  if (this.isRoot(dir)) {
     this._isPackage = true;
     this.rootDir = dir;
     return dir;
@@ -69,8 +72,8 @@ BaseChannel.prototype.isPackage = function () {
  * @param  dir
  * @return {Boolean}
  */
-BaseChannel.prototype.isRoot = function () {
-  return this._isRoot();
+BaseChannel.prototype.isRoot = function (dir) {
+  return this._isRoot(dir);
 };
 
 BaseChannel.prototype._isRoot = function () {
@@ -123,13 +126,18 @@ BaseChannel.prototype.getVersion = function () {
 /**
  * Sets version number in source (should not be overridden)
  */
-BaseChannel.prototype.setVersion = function (version) {
+BaseChannel.prototype.setVersion = function (version, cb) {
   try {
     var currentVersion = this.getVersion('none');
     if(currentVersion !== version) {
       this.debug('Changing version from %s to %s', currentVersion, version);
       if(this._setVersion) {
-        this._setVersion.call(this, arguments);
+        var result = this._setVersion.call(this, arguments);
+        if(result !== undefined) {
+          cb(result);
+        }
+      } else {
+        cb();
       }
       this.versionChanged = true;
     } else {
@@ -143,12 +151,28 @@ BaseChannel.prototype.setVersion = function (version) {
   }
 };
 
-BaseChannel.prototype.checkConflict = function () {
-  if(!this._checkConflict){
-    return false;
+/**
+ * The _checkConflict function should be implemented by the channel and return a string or true if there is a conflict.
+ */
+BaseChannel.prototype.conflictCheck = function (version, cb) {
+  if(!this._conflictCheck){
+    return cb(null);
   }
-  if(this._checkConflict.apply(this, arguments) {
-    
+  var parseConflict = function(msg){
+    if(msg === true) {
+      msg = 'Conflict reported';
+    }
+    if(msg) {
+      this.error(msg);
+    }
+    cb(msg);
+  };
+  
+  // Fairly complex but this is so that _conflictCheck can either return a value directly or if it is async then can call a callback.
+  var msg = this._conflictCheck(version, parseConflict);
+
+  if(msg !== undefined) {
+    parseConflict(msg);
   }
 };
 
