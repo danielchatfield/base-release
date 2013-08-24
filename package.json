@@ -30,6 +30,6 @@
     "test": "grunt"
   },
   "dependencies": {
-    "debug": "~0.7.2"
+    "semver": "~2.1.0"
   }
 }
