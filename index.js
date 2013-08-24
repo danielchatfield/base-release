@@ -132,7 +132,7 @@ BaseChannel.prototype.setVersion = function (version, cb) {
     if(currentVersion !== version) {
       this.debug('Changing version from %s to %s', currentVersion, version);
       if(this._setVersion) {
-        var result = this._setVersion.call(this, arguments);
+        var result = this._setVersion.apply(this, arguments);
         if(result !== undefined) {
           cb(result);
         }
@@ -166,7 +166,7 @@ BaseChannel.prototype.conflictCheck = function (version, cb) {
       this.error(msg);
     }
     cb(msg);
-  };
+  }.bind(this);
   
   // Fairly complex but this is so that _conflictCheck can either return a value directly or if it is async then can call a callback.
   var msg = this._conflictCheck(version, parseConflict);
